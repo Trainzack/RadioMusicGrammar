@@ -20,13 +20,17 @@
 #define SAMPLE_RATE_48  	3 // 011
 #define SAMPLE_RATE_96  	4 // 100
 
+#define MAX_NAME_LENGTH 128
+
 static uint32_t SAMPLE_RATES[5] = { 11025,22050,44100,48000,96000 };
 static uint8_t BIT_DEPTHS[4] = {8,16,24,32};
+
+static int MAX_NAME = MAX_NAME_LENGTH;
 
 class AudioFileInfo {
 public:
 
-	String name;
+	char name[MAX_NAME_LENGTH];
 	// Size doesn't include the header for wav files, just the length of the audio
 	uint32_t size;
 
@@ -108,6 +112,7 @@ public:
 	// 1 0 0 : 48
 	// 1 0 1 : 96
 	uint8_t format = 0;
+
 };
 
 #endif

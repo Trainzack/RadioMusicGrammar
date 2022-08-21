@@ -67,7 +67,7 @@ bool SDPlayPCM::changeFileTo(AudioFileInfo* info, bool closeFirst) {
 	if (closeFirst) {
 		rawfile.close();
 	}
-	rawfile = SD.open(info->name.c_str());
+	rawfile = SD.open(info->name);
 
 	dataSize = info->size;
 	bytesLeftInFile = info->size;
@@ -151,8 +151,10 @@ bool SDPlayPCM::playFrom(AudioFileInfo* info) {
 	);
 
 
+  String name(info->name);
+
 	// We use the same file, just seek inside it.
-	if (info->name.compareTo(filename) == 0) {
+	if (name.compareTo(filename) == 0) {
 		D(
 			debugHeader();
 			Serial.print("Continuing on file ");

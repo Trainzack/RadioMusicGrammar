@@ -87,6 +87,7 @@ File settingsFile;
 
 Settings settings("SETTINGS.TXT");
 LedControl ledControl;
+
 FileScanner fileScanner;
 AudioEngine audioEngine;
 Interface interface;
@@ -147,7 +148,7 @@ void setup() {
 		D(Serial.print("Set bank to ");Serial.println(playState.bank););
 	}
 
-	interface.init(fileScanner.fileInfos[playState.bank][0].size, fileScanner.numFilesInBank[playState.bank], settings, &playState);
+	interface.init(fileScanner.getFileInfo(playState.bank, 0).size, fileScanner.numFilesInBank[playState.bank], settings, &playState);
 
 	D(Serial.println("--READY--"););
 }
@@ -233,7 +234,8 @@ void loop() {
 
 		playState.currentChannel = playState.nextChannel;
 
-		AudioFileInfo* currentFileInfo = &fileScanner.fileInfos[playState.bank][playState.nextChannel];
+    AudioFileInfo nextFileInfo = fileScanner.getFileInfo(playState.bank, playState.nextChannel);
+		AudioFileInfo* currentFileInfo = &nextFileInfo;
 
 		audioEngine.changeTo(currentFileInfo, interface.start);
 		playState.channelChanged = false;
@@ -401,7 +403,7 @@ int testIndex = 0;
 void engineTest() {
 
 	if(!tested) {
-		audioEngine.test(fileScanner.fileInfos[playState.bank][0],fileScanner.fileInfos[playState.bank][1]);
+		audioEngine.test(fileScanner.getFileInfo(playState.bank, 0),fileScanner.getFileInfo(playState.bank, 1));
 		tested = true;
 	}
 
@@ -413,7 +415,7 @@ void engineTest() {
 			Serial.println("Back to start");
 			testIndex = 0;
 		}
-		audioEngine.test(fileScanner.fileInfos[playState.bank][testIndex],fileScanner.fileInfos[playState.bank][testIndex+1]);
+		audioEngine.test(fileScanner.getFileInfo(playState.bank, testIndex),fileScanner.getFileInfo(playState.bank, testIndex+1));
 	}
 
 	return;
@@ -430,4 +432,3 @@ void peakMeter() {
 	ledControl.multi(monoPeak - 1);
 	peakDisplayTimer = 0;
 }
-

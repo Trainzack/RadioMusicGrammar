@@ -39,7 +39,9 @@ void Settings::read() {
 	char character;
 	String settingName;
 	String settingValue;
+D(Serial.println("-- Opened settings.txt"););
 	settingsFile = SD.open("settings.txt");
+
 
 	uint8_t NAME = 1;
 	uint8_t VALUE = 2;

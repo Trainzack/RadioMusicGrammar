@@ -10,33 +10,40 @@
 #endif
 
 // File name compare routine for qsort
-int fileNameCompare(const void *a, const void *b) {
+/*int fileNameCompare(const void *a, const void *b) {
 	AudioFileInfo *sa = (AudioFileInfo *) a;
 	AudioFileInfo *sb = (AudioFileInfo *) b;
 
 	return sa->name.compareTo(sb->name);
-}
+}*/
 
 FileScanner::FileScanner() {
 }
 
+AudioFileInfo FileScanner::getFileInfo(int bank, int file) {
+  return fileInfos[bank][file];
+}
+
 void FileScanner::sortFiles() {
+  /* DEPRECATRED: WE DON'T NEED ANY SORTING
 	for (int i = 0; i < BANKS; i++) {
 		if (numFilesInBank[i] > 0) {
 			qsort(&(fileInfos[i][0]), numFilesInBank[i], sizeof(AudioFileInfo),
 					fileNameCompare);
 		}
 	}
+ */
 }
 
 void FileScanner::scan(File* root, Settings& settings) {
 
 	onlyNativeFormat = !settings.anyAudioFiles;
 
+/*
 	if(!onlyNativeFormat) {
 		maximumFilesPerBank = 32;
 	}
-
+*/
 	if (SD.exists("config.txt")) {
 		D(Serial.println("Scan TipTop"); );
 		getExtensionlessFilesInRoot(root);
@@ -66,15 +73,16 @@ void FileScanner::scan(File* root, Settings& settings) {
 }
 
 void FileScanner::showSortedFiles() {
+  /*
 	for (int i = 0; i < BANKS; i++) {
 		Serial.print("Bank ");
 		Serial.println(i);
 		if (numFilesInBank[i] > 0) {
 			for(int j=0;j<numFilesInBank[i];j++) {
-				Serial.println(fileInfos[i][j].name);
+				Serial.println(stubinfo.name);
 			}
 		}
-	}
+	}*/
 }
 
 void FileScanner::getExtensionlessFilesInRoot(File* root) {
@@ -106,7 +114,10 @@ void FileScanner::getExtensionlessFilesInRoot(File* root) {
 						Serial.println(fileInfo.size % 3);
 					}
 				);
-				fileInfo.name = currentFile.name();
+				//currentFile.name().copy(fileInfo.name, AudioFileInfo.MAX_NAME); // TODO: Is this correctly null terminated?
+
+        strcpy(fileInfo.name, currentFile.name());
+       
 				numFilesInBank[directoryNumber]++;
 			}
 			if (numFilesInBank[directoryNumber] >= MAX_FILES) {
@@ -170,7 +181,7 @@ void FileScanner::scanDirectory(File* dir) {
 					int numFiles = numFilesInBank[directoryNumber];
 
 					AudioFileInfo& fileInfo =
-							fileInfos[directoryNumber][numFiles];
+              fileInfos[directoryNumber][numFiles];
 					// wav / WAV
 					if (i == 2 || i == 3) {
 						addFile = processWavFile(&currentFile, fileInfo);
@@ -179,7 +190,10 @@ void FileScanner::scanDirectory(File* dir) {
 					}
 					if (addFile) {
 
-						fileInfo.name = currentDirectory + "/" + currentFilename;
+						String concatname = currentDirectory + "/" + currentFilename;
+
+            strcpy(fileInfo.name, concatname.c_str());
+           
 						numFilesInBank[directoryNumber]++;
 						D(
 							Serial.print("Adding file ");
@@ -187,6 +201,7 @@ void FileScanner::scanDirectory(File* dir) {
 							Serial.print(" : ");
 							Serial.println(currentFilename);
 						);
+            
 						if (numFilesInBank[directoryNumber] == MAX_FILES) {
 							D(Serial.println("Max Files reached"); );
 							currentFile.close();

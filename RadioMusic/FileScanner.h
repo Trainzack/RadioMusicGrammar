@@ -6,7 +6,7 @@
 #include "WavHeaderReader.h"
 #include "Settings.h"
 
-#define BANKS 16
+#define BANKS 3
 #define MAX_FILES 48
 
 // .raw and .wav but both lower and upper case
@@ -18,11 +18,18 @@ class FileScanner {
 		void scan(File* root, Settings& settings);
 
 		int lastBankIndex = 0;
-		AudioFileInfo fileInfos[BANKS][MAX_FILES];
+    
+    
+		AudioFileInfo getFileInfo(int bank, int file);
+    
+    AudioFileInfo stubinfo;
 		int numFilesInBank[BANKS];
 
 	private:
-		uint8_t maximumFilesPerBank = MAX_FILES;
+		//uint8_t maximumFilesPerBank = MAX_FILES;
+
+    AudioFileInfo fileInfos[BANKS][MAX_FILES];
+    
 		void scanDirectory(File* dir);
 		void sortFiles();
 		void showSortedFiles();
